@@ -4,62 +4,61 @@
 using namespace std;
 
 // -------------------- Singly Linked List Node --------------------
-class Node {
+class Node
+{
 public:
     int accNo;
     string name;
     long long balance;
-    Node* next;
+    Node *next;
 
-    Node(int a, const string& n, long long b)
+    Node(int a, const string &n, long long b)
         : accNo(a), name(n), balance(b), next(nullptr) {}
 };
 
 // -------------------- Bank (manages the linked list) --------------------
-class Bank {
+class Bank
+{
 private:
-    Node* head;
-
-    Node* findPrev(int accNo) {
-        // Return the previous node of the node that has accNo (or nullptr if head)
-        Node* prev = nullptr;
-        Node* cur = head;
-        while (cur) {
-            if (cur->accNo == accNo) return prev;
-            prev = cur;
-            cur = cur->next;
-        }
-        return nullptr; // not found
-    }
+    Node *head; // Head of the singly linked list
 
 public:
     Bank() : head(nullptr) {}
 
-    ~Bank() {
+    ~Bank()
+    {
         // free entire list
-        Node* cur = head;
-        while (cur) {
-            Node* nxt = cur->next;
+        Node *cur = head;
+        while (cur)
+        {
+            Node *nxt = cur->next;
             delete cur;
             cur = nxt;
         }
     }
 
-    bool exists(int accNo) const {
-        Node* cur = head;
-        while (cur) {
-            if (cur->accNo == accNo) return true;
+    bool exists(int accNo) const
+    {
+        Node *cur = head;
+        while (cur)
+        {
+            if (cur->accNo == accNo)
+                return true;
             cur = cur->next;
         }
         return false;
     }
 
-    bool addAccount(int accNo, const string& name, long long initial) {
-        if (accNo <= 0 || initial < 0) return false;
-        if (exists(accNo)) return false; // duplicate
+    bool addAccount(int accNo, const string &name, long long initial)
+    {
+        if (accNo <= 0 || initial < 0)
+            return false;
+        if (exists(accNo))
+            return false; // duplicate
 
-        Node* n = new (std::nothrow) Node(accNo, name, initial);
-        if (!n) return false;
+        Node *n = new (std::nothrow) Node(accNo, name, initial);
+        if (!n)
+            return false;
 
         // insert at front for O(1)
         n->next = head;
@@ -67,11 +66,15 @@ public:
         return true;
     }
 
-    bool deposit(int accNo, long long amount) {
-        if (amount <= 0) return false;
-        Node* cur = head;
-        while (cur) {
-            if (cur->accNo == accNo) {
+    bool deposit(int accNo, long long amount)
+    {
+        if (amount <= 0)
+            return false;
+        Node *cur = head;
+        while (cur)
+        {
+            if (cur->accNo == accNo)
+            {
                 cur->balance += amount;
                 return true;
             }
@@ -84,12 +87,17 @@ public:
     //   1  success
     //   0  account not found
     //  -1  insufficient funds or invalid amount
-    int withdraw(int accNo, long long amount) {
-        if (amount <= 0) return -1;
-        Node* cur = head;
-        while (cur) {
-            if (cur->accNo == accNo) {
-                if (cur->balance < amount) return -1;
+    int withdraw(int accNo, long long amount)
+    {
+        if (amount <= 0)
+            return -1;
+        Node *cur = head;
+        while (cur)
+        {
+            if (cur->accNo == accNo)
+            {
+                if (cur->balance < amount)
+                    return -1;
                 cur->balance -= amount;
                 return 1;
             }
@@ -98,43 +106,58 @@ public:
         return 0; // not found
     }
 
-    const Node* search(int accNo) const {
-        Node* cur = head;
-        while (cur) {
-            if (cur->accNo == accNo) return cur;
+    const Node *search(int accNo) const
+    {
+        Node *cur = head;
+        while (cur)
+        {
+            if (cur->accNo == accNo)
+                return cur;
             cur = cur->next;
         }
         return nullptr;
     }
 
-    bool deleteAccount(int accNo) {
-        if (!head) return false;
+    bool deleteAccount(int accNo)
+    {
+        if (!head)
+            return false;
 
         // If the head is the target
-        if (head->accNo == accNo) {
-            Node* t = head;
-            head = head->next;
-            delete t;
+        if (head->accNo == accNo)
+        {
+            Node *t = head;
+            head = head->next; // Move head to next node
+            delete t;          // Delete the old head
             return true;
         }
 
-        // Otherwise find previous
-        Node* prev = findPrev(accNo);
-        if (!prev || !prev->next) return false; // not found
-
-        Node* target = prev->next;
-        prev->next = target->next;
-        delete target;
-        return true;
+        // Otherwise, iterate through the list and find the target
+        Node *cur = head;
+        while (cur && cur->next)
+        {
+            if (cur->next->accNo == accNo)
+            {
+                Node *t = cur->next;         // Node to be deleted
+                cur->next = cur->next->next; // Skip over the target node
+                delete t;                    // Delete the target node
+                return true;
+            }
+            cur = cur->next; // Move to the next node
+        }
+        return false; // Account not found
     }
 
-    void displayAll() const {
-        if (!head) {
+    void displayAll() const
+    {
+        if (!head)
+        {
             cout << "No accounts found.\n";
             return;
         }
-        Node* cur = head;
-        while (cur) {
+        Node *cur = head;
+        while (cur)
+        {
             cout << "Account No: " << cur->accNo
                  << "; Name: " << cur->name
                  << "; Balance: " << cur->balance << "\n";
@@ -144,12 +167,14 @@ public:
 };
 
 // -------------------- Input helpers --------------------
-void clearStdin() {
+void clearStdin()
+{
     cin.clear();
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
-bool askRetry() {
+bool askRetry()
+{
     cout << "Do you want to retry? y/n: ";
     char ch;
     cin >> ch;
@@ -157,45 +182,71 @@ bool askRetry() {
     return (ch == 'y' || ch == 'Y');
 }
 
-int readInt(const string& prompt) {
-    while (true) {
+int readInt(const string &prompt)
+{
+    while (true)
+    {
         cout << prompt;
         int x;
-        if (cin >> x) { clearStdin(); return x; }
+        if (cin >> x)
+        {
+            clearStdin();
+            return x;
+        }
         cout << "Invalid input. ";
         clearStdin();
-        if (!askRetry()) return -1;
+        if (!askRetry())
+            return -1;
     }
 }
 
-long long readLL(const string& prompt) {
-    while (true) {
+long long readLL(const string &prompt)
+{
+    while (true)
+    {
         cout << prompt;
         long long x;
-        if (cin >> x) { clearStdin(); return x; }
-        cout << "Invalid input. ";
-        clearStdin();
-        if (!askRetry()) return -1;
+
+        if (cin >> x)
+        {
+            clearStdin();
+            return x;
+        }
+        else
+        {
+
+            cout << "Invalid input. Please enter a valid number.\n";
+            clearStdin();
+
+            if (!askRetry())
+                return -1;
+        }
     }
 }
 
-string readLine(const string& prompt, size_t minLetters = 1) {
-    while (true) {
+string readLine(const string &prompt)
+{
+    while (true)
+    {
         cout << prompt;
         string s;
         getline(cin, s);
-        // simple validation: not empty
-        if (!s.empty()) return s;
-        cout << "Invalid input. ";
-        if (!askRetry()) return "";
+
+        // Simple validation: input should not be empty
+        if (!s.empty())
+            return s;
+
+        cout << "Invalid input. Please enter something." << endl;
+        if (!askRetry())
+            return ""; // Exit if user doesn't want to retry
     }
 }
 
-// -------------------- Main menu --------------------
-int main() {
-    Bank bank;
-
-    while (true) {
+// -------------------- Display Menu --------------------
+void displayMenu(Bank &bank)
+{
+    while (true)
+    {
         cout << "\n--- MENU ---\n"
              << "1. Add Account\n"
              << "2. Display Accounts\n"
@@ -207,97 +258,176 @@ int main() {
              << "Enter choice: ";
 
         int choice;
-        if (!(cin >> choice)) { cout << "Invalid choice.\n"; clearStdin(); if (!askRetry()) break; else continue; }
+        if (!(cin >> choice))
+        {
+            cout << "Invalid choice.\n";
+            clearStdin();
+            if (!askRetry())
+                break;
+            else
+                continue;
+        }
         clearStdin();
 
-        if (choice == 1) {
+        if (choice == 1)
+        {
             // Add Account
-            do {
+            do
+            {
                 int acc = readInt("Enter unique account number: ");
-                if (acc == -1) break;
+                if (acc == -1)
+                    break;
                 string name = readLine("Enter full name: ");
-                if (name.empty()) break;
+                if (name.empty())
+                    break;
                 long long bal = readLL("Enter initial balance (>= 0): ");
-                if (bal < 0) { cout << "Invalid amount.\n"; if (!askRetry()) break; else continue; }
+                if (bal < 0)
+                {
+                    cout << "Invalid amount.\n";
+                    if (!askRetry())
+                        break;
+                    else
+                        continue;
+                }
 
-                if (bank.addAccount(acc, name, bal)) {
+                if (bank.addAccount(acc, name, bal))
+                {
                     cout << "Account added.\n";
                     break;
-                } else {
+                }
+                else
+                {
                     cout << "Add failed (duplicate number or invalid data).\n";
                 }
             } while (askRetry());
         }
-        else if (choice == 2) {
+        else if (choice == 2)
+        {
             bank.displayAll();
         }
-        else if (choice == 3) {
+        else if (choice == 3)
+        {
             // Deposit
-            do {
+            do
+            {
                 int acc = readInt("Enter account number: ");
-                if (acc == -1) break;
+                if (acc == -1)
+                    break;
                 long long amt = readLL("Enter deposit amount (> 0): ");
-                if (amt <= 0) { cout << "Invalid amount.\n"; if (!askRetry()) break; else continue; }
+                if (amt <= 0)
+                {
+                    cout << "Invalid amount.\n";
+                    if (!askRetry())
+                        break;
+                    else
+                        continue;
+                }
 
-                if (bank.deposit(acc, amt)) {
+                if (bank.deposit(acc, amt))
+                {
                     cout << "Deposit successful.\n";
                     break;
-                } else {
+                }
+                else
+                {
                     cout << "Deposit failed (account not found or invalid amount).\n";
                 }
             } while (askRetry());
         }
-        else if (choice == 4) {
+        else if (choice == 4)
+        {
             // Withdraw
-            do {
+            do
+            {
                 int acc = readInt("Enter account number: ");
-                if (acc == -1) break;
+                if (acc == -1)
+                    break;
                 long long amt = readLL("Enter withdrawal amount (> 0): ");
-                if (amt <= 0) { cout << "Invalid amount.\n"; if (!askRetry()) break; else continue; }
+                if (amt <= 0)
+                {
+                    cout << "Invalid amount.\n";
+                    if (!askRetry())
+                        break;
+                    else
+                        continue;
+                }
 
                 int r = bank.withdraw(acc, amt);
-                if (r == 1)      { cout << "Withdraw successful.\n"; break; }
-                else if (r == 0) { cout << "Account not found.\n"; }
-                else             { cout << "Insufficient funds or invalid amount.\n"; }
+                if (r == 1)
+                {
+                    cout << "Withdraw successful.\n";
+                    break;
+                }
+                else if (r == 0)
+                {
+                    cout << "Account not found.\n";
+                }
+                else
+                {
+                    cout << "Insufficient funds or invalid amount.\n";
+                }
             } while (askRetry());
         }
-        else if (choice == 5) {
+        else if (choice == 5)
+        {
             // Search
-            do {
+            do
+            {
                 int acc = readInt("Enter account number to search: ");
-                if (acc == -1) break;
-                auto node = bank.search(acc);
-                if (node) {
-                    cout << "Account No: " << node->accNo
-                         << "; Name: "   << node->name
-                         << "; Balance: "<< node->balance << "\n";
+                if (acc == -1)
                     break;
-                } else {
+                auto node = bank.search(acc);
+                if (node)
+                {
+                    cout << "Account No: " << node->accNo
+                         << "; Name: " << node->name
+                         << "; Balance: " << node->balance << "\n";
+                    break;
+                }
+                else
+                {
                     cout << "Account not found.\n";
                 }
             } while (askRetry());
         }
-        else if (choice == 6) {
+        else if (choice == 6)
+        {
             // Delete
-            do {
+            do
+            {
                 int acc = readInt("Enter account number to delete: ");
-                if (acc == -1) break;
-                if (bank.deleteAccount(acc)) {
+                if (acc == -1)
+                    break;
+                if (bank.deleteAccount(acc))
+                {
                     cout << "Account deleted.\n";
                     break;
-                } else {
+                }
+                else
+                {
                     cout << "Delete failed (account not found).\n";
                 }
             } while (askRetry());
         }
-        else if (choice == 7) {
+        else if (choice == 7)
+        {
             cout << "Exiting...\n";
             break;
         }
-        else {
+        else
+        {
             cout << "Invalid choice.\n";
-            if (!askRetry()) break;
+            if (!askRetry())
+                break;
         }
     }
+}
+
+// -------------------- Main menu --------------------
+int main()
+{
+    Bank bank;
+    displayMenu(bank);
+
     return 0;
 }
